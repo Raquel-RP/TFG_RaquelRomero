@@ -20,13 +20,13 @@ Conformado por:
     - Language Frameworks: lenguajes de más alto nivel (cilium, bcc, libbpf, ...) que producen eBPF bytecode
 
 2.	eBPF Runtime
-- [ ]     - Coge el bytecode y verifica que es seguro para ejecutarlo, lo compila (JIT Compiler) y lo corre en el hook point requerido
+- Coge el bytecode y verifica que es seguro para ejecutarlo, lo compila (JIT Compiler) y lo corre en el hook point requerido
 
 
 
 Process Tracer via exec() syscalls: https://github.com/iovisor/bcc/blob/master/tools/execsnoop.py
 
-
+---
 ### ETW 
 3 partes:
 - Proveedor: emitirá un registro, identificado por una ID única
@@ -47,6 +47,7 @@ Implementa un backend para libpcap para capturar eventos ETW
 Winshark funciona en sesiones ETW, es por eso que puede seleccionar una sesión ETW en lugar de la interfaz de red al inicio de la captura. Luego, Winshark genera disectores lua para cada proveedor basado en manifiesto registrado en su computadora, durante el paso de instalación. Winshark también puede analizar proveedores basados en registros de seguimiento.
 Información de los procesos: carga de CPU, Bytes privados, Working Set (Bytes totales), PID, Descripción del proceso, nombre de la compañía. 
 
+---
 
 ### eCapture Herramienta
 
@@ -58,6 +59,7 @@ eCapture busca el archivo /etc/ld.so.conf predeterminado, para buscar directorio
 
 Con ese comando podemos obtener el resultado en pcapng y leerlo con Wireshark directamente.
 
+---
 
 ### Instalaciones hechas
 
@@ -72,13 +74,18 @@ bpftool v7.3.0
 using libbpf v1.3
 features: llvm, skeletons
 
+---
 
-### Tutoriales eBPF
+### Tutoriales eBPF (Links)
 https://eunomia.dev/tutorials/1-helloworld/
+
 https://cilium.io/labs/categories/getting-started/
+
 Labs de cilium: https://play.instruqt.com/embed/isovalent/tracks/cilium-getting-started
+
 https://github.com/zoidyzoidzoid/awesome-ebpf
 
+---
 
 ### Tutorial bpftrace 
 Lenguaje de tracing de alto nivel y tiempo de ejecución para Linux basado en BPF. Admite seguimiento estático y dinámico tanto para el kernel como para el espacio de usuario.
@@ -89,18 +96,18 @@ Hace un listado de todos los probes y se puede poner un termino de busqueda.
 Un probe es un punto de instrumentación para capturar datos de eventos.
 
 #### >> bpftrace -e 'BEGIN { printf("hello world\n"); }'
-Attaching 1 probe...
-hello world
-^C
+> Attaching 1 probe...
+> hello world
+> ^C
 
 Esto imprime un mensaje de bienvenida. La palabra BEGIN es un probe especial que se activa al inicio del programa, antes que el resto de tracepoint, normalmente para imprimir mensajes iniciales. Puede usarlo para configurar variables e imprimir encabezados.
 Se puede asociar una acción con probes, en { }. Este ejemplo llama a printf() cuando se activa el probe. Con -e indicamos que ejecute el programa/expresion a continuación.
 
 #### >> bpftrace -e 'tracepoint:syscalls:sys_enter_openat { printf("%s %s\n", comm, str(args.filename)); }'
-Attaching 1 probe...
-systemd-journal /proc/1856/status
-systemd-journal /proc/1856/status
-...
+> Attaching 1 probe...
+> systemd-journal /proc/1856/status
+> systemd-journal /proc/1856/status
+> ...
 
 Este archivo de seguimiento se abre a medida que ocurren y estamos imprimiendo el nombre del proceso y la ruta. Este archivo de seguimiento se abre a medida que ocurren y estamos imprimiendo el nombre del proceso y la ruta.
 
@@ -111,14 +118,14 @@ Comienza con el probe tracepoint:syscalls:sys_enter_openat: este es el tipo de p
 *str()* convierte un puntero en la cadena a la que apunta.
 
 #### >> bpftrace -e 'tracepoint:raw_syscalls:sys_enter { @[comm] = count(); }'
-Attaching 1 probe...
-^C
-
-@[wpa_supplicant]: 1
-@[ThreadPoolSingl]: 2
-@[(udev-worker)]: 3
-@[QXcbEventQueue]: 3
-@[gedit]: 4
+> Attaching 1 probe...
+> ^C
+> 
+> @[wpa_supplicant]: 1
+> @[ThreadPoolSingl]: 2
+> @[(udev-worker)]: 3
+> @[QXcbEventQueue]: 3
+> @[gedit]: 4
 
 Esto resume las syscalls por nombre de proceso, imprimiendo un informe en Ctrl-C.
 
@@ -128,18 +135,18 @@ count(): esta es una función de mapa. count() cuenta el número de veces que se
 Los mapas se imprimen automáticamente cuando finaliza bpftrace (por ejemplo, mediante Ctrl-C).
 
 #### >> bpftrace -e 'tracepoint:syscalls:sys_exit_read /pid == 18644/ { @bytes = hist(args.ret); }'
-Attaching 1 probe...
-^C
-
-@bytes:
-[0, 1]                12 |@@@@@@@@@@@@@@@@@@@@                                |
-[2, 4)                18 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     |
-[4, 8)                 0 |                                                    |
-[8, 16)                0 |                                                    |
-[16, 32)               0 |                                                    |
-[32, 64)              30 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[64, 128)             19 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                    |
-[128, 256)             1 |@
+> Attaching 1 probe...
+> ^C
+> 
+> @bytes:
+> [0, 1]                12 |@@@@@@@@@@@@@@@@@@@@                                |
+> [2, 4)                18 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                     |
+> [4, 8)                 0 |                                                    |
+> [8, 16)                0 |                                                    |
+> [16, 32)               0 |                                                    |
+> [32, 64)              30 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [64, 128)             19 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                    |
+> [128, 256)             1 |@
 
 Esto resume el valor de retorno de la función del kernel sys_read() para el PID 18644, imprimiéndolo como un histograma.
 
@@ -149,17 +156,17 @@ ret: este es el valor de retorno de la función. Para sys_read(), esto es -1 (er
 hist(): Esta es una función de mapa que resume el argumento como un histograma de potencia de 2. El resultado muestra filas que comienzan con notación de intervalo, donde, por ejemplo, [128, 256) significa que el valor es: 128<=valor<256. Otras funciones de mapa incluyen lhist() (hist lineal), count(), sum(), avg(), min() y max().
 
 #### >> bpftrace -e 'kretprobe:vfs_read { @bytes = lhist(retval, 0, 2000, 200); }'
-Attaching 1 probe...
-^C
-
-@bytes:
-(..., 0)               7 |@@                                                  |
-[0, 200)             161 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[200, 400)             0 |                                                    |
-[400, 600)             0 |                                                    |
-[600, 800)             0 |                                                    |
-[800, 1000)            0 |                                                    |
-[1000, 1200)           2 |                                                    |
+> Attaching 1 probe...
+> ^C
+> 
+> @bytes:
+> (..., 0)               7 |@@                                                  |
+> [0, 200)             161 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [200, 400)             0 |                                                    |
+> [400, 600)             0 |                                                    |
+> [600, 800)             0 |                                                    |
+> [800, 1000)            0 |                                                    |
+> [1000, 1200)           2 |                                                    |
 
 Resume los bytes read() como un histograma lineal y realiza un seguimiento mediante el seguimiento dinámico del kernel.
 
@@ -168,41 +175,41 @@ lhist(): este es un histograma lineal, donde los argumentos son: valor, mínimo,
 
 #### >> bpftrace -e 'kprobe:vfs_read { @start[tid] = nsecs; } kretprobe:vfs_read /@start[tid]/ { @ns[comm] = hist(nsecs - @start[tid]); delete(@start[tid]); }'
 
-Attaching 2 probes...
-^C
-
-@ns[NetworkManager]:
-[8K, 16K)              1 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-
-@ns[sudo]:
-[8K, 16K)              5 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[16K, 32K)             2 |@@@@@@@@@@@@@@@@@@@@                                |
-
-@ns[haroopad]:
-[1K, 2K)               2 |@@@                                                 |
-[2K, 4K)               0 |                                                    |
-[4K, 8K)               6 |@@@@@@@@@                                           |
-[8K, 16K)             32 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-
-@ns[telegram-deskto]:
-[1K, 2K)               6 |@@@@@@@@@@@@@                                       |
-[2K, 4K)               7 |@@@@@@@@@@@@@@@                                     |
-[4K, 8K)              23 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[8K, 16K)             18 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            |
-[16K, 32K)             1 |@@                                                  |
-[32K, 64K)             1 |@@                                                  |
-
-@ns[thunderbird]:
-[512, 1K)              1 |@@                                                  |
-[1K, 2K)               1 |@@                                                  |
-[2K, 4K)               8 |@@@@@@@@@@@@@@@@@@@                                 |
-[4K, 8K)              21 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[8K, 16K)             14 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  |
-[16K, 32K)            19 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     |
-
-@start[3912]: 3951921123390
-@start[3899]: 3951924159969
-@start[1398]: 3951936619915
+> Attaching 2 probes...
+> ^C
+> 
+> @ns[NetworkManager]:
+> [8K, 16K)              1 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> 
+> @ns[sudo]:
+> [8K, 16K)              5 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [16K, 32K)             2 |@@@@@@@@@@@@@@@@@@@@                                |
+> 
+> @ns[haroopad]:
+> [1K, 2K)               2 |@@@                                                 |
+> [2K, 4K)               0 |                                                    |
+> [4K, 8K)               6 |@@@@@@@@@                                           |
+> [8K, 16K)             32 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> 
+> @ns[telegram-deskto]:
+> [1K, 2K)               6 |@@@@@@@@@@@@@                                       |
+> [2K, 4K)               7 |@@@@@@@@@@@@@@@                                     |
+> [4K, 8K)              23 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [8K, 16K)             18 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@            |
+> [16K, 32K)             1 |@@                                                  |
+> [32K, 64K)             1 |@@                                                  |
+> 
+> @ns[thunderbird]:
+> [512, 1K)              1 |@@                                                  |
+> [1K, 2K)               1 |@@                                                  |
+> [2K, 4K)               8 |@@@@@@@@@@@@@@@@@@@                                 |
+> [4K, 8K)              21 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [8K, 16K)             14 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                  |
+> [16K, 32K)            19 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     |
+> 
+> @start[3912]: 3951921123390
+> @start[3899]: 3951924159969
+> @start[1398]: 3951936619915
 
 Resume el tiempo empleado en read(), en nanosegundos, como un histograma, por nombre de proceso.
 
@@ -212,7 +219,22 @@ nsecs: Nanosegundos desde el arranque. Este es un contador de marca de tiempo de
 delete(@start[tid]): esto libera la variable.
 https://eunomia.dev/tutorials/bpftrace-tutorial/
 
+- - -
 
+### eBPF Tutorial
+(Bumblebee: https://bumblebee.io/EN   https://github.com/solo-io/bumblebee)
+
+Un programa eBPF consta de dos partes principales: la parte del espacio del kernel y la parte del espacio del usuario. La parte del espacio del kernel contiene la lógica real del programa eBPF, mientras que la parte del espacio del usuario es responsable de cargar, ejecutar y monitorear el programa del espacio del kernel.
+
+> Pasos previos
+> - Instalar compiladores LLVM y Clang 
+> https://releases.llvm.org/download.html   
+> https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm
+> - Instalar framework de desarrollo BCC (eBPF Compiler Collection)
+>  https://github.com/iovisor/bcc/blob/master/INSTALL.md
+
+---
+### Objetivos
 
 - filtrar por PID
 - comunicaciones de internet

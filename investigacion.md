@@ -236,6 +236,21 @@ Un programa eBPF consta de dos partes principales: la parte del espacio del kern
 >  wget https://aka.pw/bpf-ecli -O ecli && chmod +x ./ecli
 >  wget https://github.com/eunomia-bpf/eunomia-bpf/releases/latest/download/ecc && chmod +x ./ecc
  
+
+**Partes de un programa eBPF:** 
+- Espacio del kernel: contiene la lógica del programa eBPF
+- Espacio del usuario: responsable de la carga, ejecución y monitorización del programa del espacio del kernel
+
+**Proceso de desarrollo de programas eBPF:**
+- Escribir programa eBPF (en C): Se ejecuta en el espacio del kernel y hace tareas específicas
+- Escribir programa del espacio de usuario (en Python, C, etc...): necesario usar la API que da BCC para cargar y manipular el programa del espacio del kernel.
+- Compilar el programa eBPF: usar BCC tool para compilar (C -> bytecode).
+- Carga y ejecución del programa eBPF: en el programa del espacio de usuario usar la API de BCC para cargar el programa compilado de eBPF en el kernel y luego ejecutarlo.
+- Unloading el programa eBPF: cuando ya no haga falta más, el programa del espacio de usuario debe hacer el unload del kernel con la BCC API.
+- Debugging y optimizacion: usar herramientas como bpftool.
+
+
+
 ---
 ### Objetivos
 
@@ -244,6 +259,4 @@ Un programa eBPF consta de dos partes principales: la parte del espacio del kern
 - dumpcap
 - hacer ping y ver el PID y extrapolar su comunicacion a wireshark viendo que hace (icmp)
 
-
-- por que hace falta, dificultades, estadisticas, citas, autores
-- 
+- Cap 2: por que hace falta, dificultades, estadisticas, citas, autores

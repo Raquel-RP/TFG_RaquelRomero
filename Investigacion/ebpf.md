@@ -1,4 +1,4 @@
-## eBPF Desarrollo de Programas
+# eBPF Desarrollo de Programas
 (Bumblebee: https://bumblebee.io/EN   https://github.com/solo-io/bumblebee)
 
 Un programa eBPF consta de dos partes principales: la parte del espacio del kernel y la parte del espacio del usuario. La parte del espacio del kernel contiene la lógica real del programa eBPF, mientras que la parte del espacio del usuario es responsable de cargar, ejecutar y monitorear el programa del espacio del kernel.
@@ -36,7 +36,7 @@ Labs de cilium: https://play.instruqt.com/embed/isovalent/tracks/cilium-getting-
 
 https://github.com/zoidyzoidzoid/awesome-ebpf
 
-- - -
+---
 ### Objetivos
 
 - filtrar por PID

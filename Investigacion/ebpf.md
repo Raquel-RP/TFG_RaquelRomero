@@ -53,7 +53,7 @@ $ sudo cat /sys/kernel/debug/tracing/trace_pipe | grep "output que busquemos"
 - Usar funciones auxiliares de BPF: como _bpf_get_current_pid_tgid()_ y _bpf_printk()_.
 - Añadir valor de retorno.
 
-**Tracepoints**
+#####**Tracepoints**
 Técnica de instrumentación estática del kernel, técnicamente son **funciones de seguimiento colocadas en el código fuente del kernel**, que son esencialmente puntos de sondeo (_probe points_) con condiciones de control insertadas en el código fuente, lo que permite el posprocesamiento con funciones de procesamiento adicionales.
 Por ejemplo, el método de seguimiento estático más común en el kernel es **printk**, que genera mensajes de log.
 Hay tracepoints al inicio y al final de las syscalls, eventos del programador (scheduler events), operaciones del sistema de archivos y E/S del disco. Los tracepoints son una API estable y su número es limitado.

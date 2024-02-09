@@ -231,8 +231,11 @@ Un programa eBPF consta de dos partes principales: la parte del espacio del kern
 > https://releases.llvm.org/download.html   
 > https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm
 > - Instalar framework de desarrollo BCC (eBPF Compiler Collection)
->  https://github.com/iovisor/bcc/blob/master/INSTALL.md
-
+>  https://github.com/iovisor/bcc/blob/master/INSTALL.md (depende de la distro)
+> - Instalar herramienta ecli y tools del compilador ecc
+>  wget https://aka.pw/bpf-ecli -O ecli && chmod +x ./ecli
+>  wget https://github.com/eunomia-bpf/eunomia-bpf/releases/latest/download/ecc && chmod +x ./ecc
+ 
 ---
 ### Objetivos
 

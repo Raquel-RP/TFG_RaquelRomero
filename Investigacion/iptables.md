@@ -65,4 +65,11 @@ sudo systemctl enable iptables.service
 Para llamar cualquier comando desde otro user
  sudo -u user_filter curl http://192.168.1.1
 
+**MEJORAS CÓDIGO**
+- Marcado que compruebe que no haya una marca ya igual
+- Asignado de UID que compruebe que no existe
+- Imprimir resultados (uid dado, iptables añadidas)
+- Correr el programa por nombre de usuario o UID
+- Poder añadir varios usuarios, que compruebe si la cadena ya está creada
+
 

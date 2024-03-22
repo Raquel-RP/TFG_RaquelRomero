@@ -62,7 +62,25 @@ eCapture busca el archivo /etc/ld.so.conf predeterminado, para buscar directorio
 Con ese comando podemos obtener el resultado en pcapng y leerlo con Wireshark directamente.
 
 ---
+### Funcionalidades eBPF
+#####- Networking
+Mejorar funcionalidades de red (Cilium project con Kubernetes, balanceadores de carga, …)
+- Packet Drops: descartar paquetes y aceptar otros, firewalling, protección de DDoS y packet-of-death vuln.
+- XDP Program Return Codes: cuando llega un paquete a la red XDP se activa y lo examina.
+    - XDP_PASS indica que el paquete debe enviarse a la pila de red en la dirección normal (como lo habría hecho si no hubiera un programa XDP).
+    - XDP_DROP hace que el paquete se descarte inmediatamente.
+    - XDP_TX devuelve el paquete desde la misma interfaz a la que llegó.
+    - XDP_REDIRECT se utiliza para enviarlo a una interfaz de red diferente.
+    - XDP_ABORTED da como resultado que el paquete se descarte, pero su uso implica un caso de error o algo inesperado, en lugar de una decisión "normal" de descartar un paquete
 
+
+Tracepoints – Tracepoints are lightweight hooks that can be used to call a function at runtime and are commonly used to account for tracing and performance in the kernel. eBPF programs can be attached to tracepoints to trace events like system calls.
+Entry to and exit from functions – Operators can attach eBPF programs to entry and exit functions so that their custom kernel programs run in the event of these respective scenarios.
+Perf events – As the name implies, this is a subsystem used to collect performance data. With eBPF, you can attach custom programs to where this data is collected.
+LSI module interface – This is a powerful module interface used by tools like AppArmor and SELinux. Both AppArmor and SELinux are commonly used in Kubernetes security techniques to apply low-level system measures to prevent and mitigate the risks of running container workloads. Similarly, eBPF programs can be attached to the LSI module interface checkpoints for runtime security with dynamic policies.
+Network interfaces (XDP) – The eXpress Data Path (XDP) allows operators to attach eBPF programs to network interfaces so that their custom programs are executed whenever a network packet is received.
+
+---
 ### Instalaciones hechas
 
 - BPFTool:

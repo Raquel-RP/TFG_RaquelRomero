@@ -55,16 +55,30 @@ $ sudo cat /sys/kernel/debug/tracing/trace_pipe | grep "output que busquemos"
 
 **Tracepoints:**
 
-
 Técnica de instrumentación estática del kernel, técnicamente son **funciones de seguimiento colocadas en el código fuente del kernel**, que son esencialmente puntos de sondeo (_probe points_) con condiciones de control insertadas en el código fuente, lo que permite el posprocesamiento con funciones de procesamiento adicionales.
 Por ejemplo, el método de seguimiento estático más común en el kernel es **printk**, que genera mensajes de log.
 Hay tracepoints al inicio y al final de las syscalls, eventos del programador (scheduler events), operaciones del sistema de archivos y E/S del disco. Los tracepoints son una API estable y su número es limitado.
 
 
 ---
-### kprobes
+### Helper function bpf_clone_redirect
+Clona y redirige el paquete asociado con skb a otro dispositivo de red de índice _ifindex_. Se pueden utilizar interfaces de entrada y salida para la redirección. El valor BPF_F_INGRESS en las flags se utiliza para hacer la distinción (la ruta de entrada se selecciona si la flag está presente, la ruta de salida en caso contrario). Esta es la única flag admitida por ahora.
 
+En comparación con el helper bpf_redirect(), bpf_clone_redirect() tiene el costo asociado de duplicar el búfer de paquetes, pero esto se puede ejecutar desde el programa eBPF. Por el contrario, bpf_redirect() es más eficiente, pero se maneja mediante un código de acción donde la redirección ocurre solo después de que el programa eBPF haya regresado.
 
+Una llamada a este helper es susceptible de cambiar el búfer de paquetes subyacente. Por lo tanto, en el momento de la carga, todas las comprobaciones de los punteros realizadas previamente por el verificador se invalidan y deben realizarse nuevamente, si el asistente se utiliza en combinación con el acceso directo a paquetes.
+
+**Returns**
+0 en caso de éxito, o un error negativo en caso de fallo. El error positivo indica una posible caída o congestión en el dispositivo de destino. Los códigos de error positivos particulares no están definidos.
+```
+static long (*bpf_clone_redirect)(struct __sk_buff *skb, __u32 ifindex, __u64 flags) = (void *) 13;
+```
+**Tipos de programas**
+Esta helper call se puede utilizar en los siguientes tipos de programas:
+
+BPF_PROG_TYPE_LWT_XMIT
+BPF_PROG_TYPE_SCHED_ACT
+BPF_PROG_TYPE_SCHED_CLS
 
 ---
 ### Tutoriales eBPF (Links)

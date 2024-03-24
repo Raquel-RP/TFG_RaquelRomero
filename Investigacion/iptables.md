@@ -63,7 +63,7 @@ https://serverfault.com/questions/610989/linux-nflog-documentation-configuration
 sudo systemctl enable iptables.service
 
 Para llamar cualquier comando desde otro user
- sudo -u user_filter curl http://192.168.1.1
+sudo -u user_filter curl http://192.168.1.1
 
 **MEJORAS CÓDIGO**
 - Marcado que compruebe que no haya una marca ya igual
@@ -71,5 +71,6 @@ Para llamar cualquier comando desde otro user
 - Imprimir resultados (uid dado, iptables añadidas)
 - Correr el programa por nombre de usuario o UID
 - Poder añadir varios usuarios, que compruebe si la cadena ya está creada
-
+- Mejora de como llamar a la app (add iptables)
+- Chekear si la cadena ya esta creada
 

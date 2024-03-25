@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import subprocess
 import sys
@@ -108,6 +110,15 @@ def delete_iptables_chain():
         logger.error(f'Error: {error_message}')
         sys.exit(1)
 
+def run_command(user):
+    try:
+        command = input("Enter the command to run: ")
+        subprocess.run(['sudo', '-u', user, command], check=True)
+
+    except subprocess.CalledProcessError as e:
+        error_message = e.stderr.decode() if e.stderr else "Unknown error"
+        logger.error(f'Error: {error_message}')
+        sys.exit(1)
 
 def main():
     parser = argparse.ArgumentParser(prog='com-filter.py',
@@ -121,7 +132,8 @@ def main():
     input_options.add_argument('--passwd', help='Password for the new user.')
     input_options.add_argument('--user', help='User to monitor.')
 
-    parser.add_argument('--run', nargs=1, help='Start monitoring in NFLOG. Provide either UID or username. Example: --run [UID | USERNAME]')
+    parser.add_argument('--run', nargs=1, help='Run command by a determine user. Example: --run USERNAME')
+    parser.add_argument('--add', nargs=1, help='Start monitoring in NFLOG. Provide either UID or username. Example: --add [UID | USERNAME]')
     parser.add_argument('--create-user', nargs='+', help='Create a new user. Example: --create-user name_user --uid UID --passwd PASSWORD')
     parser.add_argument('--delete-user', nargs=1, help='Delete an existing user.  Example: --delete-user username')
     parser.add_argument('--delete-iptables', action='store_true', help='Delete the iptables entries needed for the filtering.')
@@ -146,9 +158,13 @@ def main():
         if args.delete_iptables:
             delete_iptables_chain()
             
+        if args.add:
+            uid_str = args.add[0]
+            add_iptables_rules(uid_str)
+
         if args.run:
             uid_str = args.run[0]
-            add_iptables_rules(uid_str)
+            run_command(uid_str)
 
 
     except KeyboardInterrupt:

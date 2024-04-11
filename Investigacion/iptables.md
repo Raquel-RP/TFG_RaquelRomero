@@ -65,6 +65,12 @@ sudo systemctl enable iptables.service
 Para llamar cualquier comando desde otro user
 sudo -u user_filter curl http://192.168.1.1
 
+**CÓODIGO PYTHON**
+- python-iptables (pip install python-iptables)
+sudo pip install --upgrade python-iptables 
+https://developers.redhat.com/blog/2020/08/18/iptables-the-two-variants-and-their-relationship-with-nftables#the_kernel_api
+sudo iptables-legacy -L
+
 **MEJORAS CÓDIGO**
 - Marcado que compruebe que no haya una marca ya igual
 - Asignado de UID que compruebe que no existe

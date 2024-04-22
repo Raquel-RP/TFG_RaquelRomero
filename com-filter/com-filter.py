@@ -22,21 +22,21 @@ output_chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), "OUTPUT")
 
 user_exists = False
 
+
 # Define function to create a user
 def create_user(name):
-    
+
     print("Creating new user...")
-    
+
     try:
-        subprocess.run(
-            ["sudo", "useradd", "-m", "-s", "/bin/bash", name], check=True
-        )
+        subprocess.run(["sudo", "useradd", "-m", "-s", "/bin/bash", name], check=True)
         logger.info(f'User "{name}" created successfully.')
 
     except subprocess.CalledProcessError as e:
         error_message = e.stderr.decode() if e.stderr else "Unknown error"
         logger.error(f"Error: {error_message}")
         sys.exit(1)
+
 
 def delete_user(name):
     try:
@@ -54,7 +54,7 @@ def add_iptables_rules(uid_str):
     try:
         # Generates a random mark value in between 0 and 65535 (0xffff)
         random_mark = random.randint(0, 65535)
-        mark = format(random_mark, '#06x')
+        mark = format(random_mark, "#06x")
 
         # Rule to filter by user UID
         match1 = iptc.Match(rule1, "owner")
@@ -78,11 +78,11 @@ def add_iptables_rules(uid_str):
         output_chain.insert_rule(rule1)
         input_chain.insert_rule(rule2)
         output_chain.insert_rule(rule3)
-        
+
         logger.info("Iptables rules added successfully.")
 
-    except subprocess.CalledProcessError as e:
-        error_message = e.stderr.decode() if e.stderr else "Unknown error"
+    except iptc.IPTCError as e:
+        error_message = str(e)
         logger.error(f"Error: {error_message}")
         sys.exit(1)
 
@@ -95,29 +95,29 @@ def delete_iptables():
 
         print("Iptables rules added by com-filter.py deleted successfully.")
 
-    except subprocess.CalledProcessError as e:
-        error_message = e.stderr.decode() if e.stderr else "Unknown error"
+    except iptc.IPTCError as e:
+        error_message = str(e)
         logger.error(f"Error: {error_message}")
         sys.exit(1)
 
 
 def check_user_exists(username):
     global user_exists
-    
+
     try:
-        pwd.getpwnam(username)  
+        pwd.getpwnam(username)
         user_exists = True
         print(f"User '{username}' exists.")
     except KeyError:
         user_exists = False
         print(f"User '{username}' does not exist.")
-        
+
 
 def cleanup(user_str):
     if user_exists == False:
         delete_user(user_str)
     delete_iptables()
-    
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -127,36 +127,39 @@ def main():
     )
 
     # Group options for the input arguments
-    input_options = parser.add_argument_group(
-        "Input Variables",
-        "These options specify input variables but do not trigger any action.",
-    )
-    #input_options.add_argument("--uid", help="UID of the user to monitor.")
-    #input_options.add_argument("--passwd", help="Password for the new user.")
-    #input_options.add_argument("--user", help="User to monitor.")
+    #input_options = parser.add_argument_group(
+    #    "Input Variables",
+    #    "These options specify input variables but do not trigger any action.",
+    #)
+    # input_options.add_argument("--uid", help="UID of the user to monitor.")
+    # input_options.add_argument("--passwd", help="Password for the new user.")
+    # input_options.add_argument("--user", help="User to monitor.")
 
     # Default argument
-    parser.add_argument("username", nargs='?', help="Username to run the command")
+    parser.add_argument("username", nargs="?", help="Username to run the command")
 
     # Optional arguments
     parser.add_argument(
-        "-c", "--create-user",
-        nargs='?',
+        "-c",
+        "--create-user",
+        nargs="?",
         help="Create a new user. Example: --create-user username",
     )
     parser.add_argument(
-        "-d", "--delete-user",
-        nargs='?',
+        "-d",
+        "--delete-user",
+        nargs="?",
         help="Delete an existing user.  Example: --delete-user username",
     )
     parser.add_argument(
-        "-v", "--verbose",
+        "-v",
+        "--verbose",
         action="store_true",
         help="Enable verbose logging (DEBUG level)",
     )
 
     args = parser.parse_args()
-    
+
     if args.verbose:
         logger.setLevel(logging.DEBUG)
         logger.debug("Verbose mode enabled.")

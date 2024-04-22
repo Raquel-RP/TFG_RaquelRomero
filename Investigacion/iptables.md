@@ -43,6 +43,8 @@ DROP       all  --  anywhere             anywhere             owner UID match us
 `sudo iptables -A OUTPUT -m connmark --mark 1 -j NFLOG`
 `dumpcap -i nflog -w uid-1001.pcap`
 
+NFLOG --nflog-group 2 
+núemero de registros
 
 sudo iptables -L
 > Chain INPUT (policy ACCEPT)
@@ -71,6 +73,23 @@ sudo pip install --upgrade python-iptables
 https://developers.redhat.com/blog/2020/08/18/iptables-the-two-variants-and-their-relationship-with-nftables#the_kernel_api
 sudo iptables-legacy -L
 
+**PRUEBAS**
+- users de /etc/passwd
+- user: systemd-resolve
+
+**POETRY**
+https://www.freecodecamp.org/news/how-to-build-and-publish-python-packages-with-poetry/
+- poetry add "paquete version"
+- poetry update 
+- poetry shell : acceder al ambiente virutal
+- poetry export --output requirements.txt
+- poetry build
+- poetry publish
+
+**OPEN EDR**
+- Directorio /opt/COMODO
+- Agente /opt/COMODO/ECC
+- https://ketanic3gmailcom.itsm-us1.comodo.com/dashboard/widgets/overview#/dashboard/overview
 **MEJORAS CÓDIGO**
 - Marcado que compruebe que no haya una marca ya igual
 - Asignado de UID que compruebe que no existe
@@ -80,3 +99,9 @@ sudo iptables-legacy -L
 - Mejora de como llamar a la app (add iptables)
 - Chekear si la cadena ya esta creada
 
+**ELK STACK**
+Docker completo:
+https://github.com/deviantony/docker-elk?tab=readme-ov-file
+docker-compose up setup
+docker-compose up
+docker-compose down -v

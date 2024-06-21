@@ -1,4 +1,4 @@
-# TFG: Auditoría de Seguridad de Comunicaciones en Red
+# Código del TFG: Auditoría de Seguridad de Comunicaciones en Red
 
 Este repositorio contiene los programas desarrollados para el Trabajo de Fin de Grado (TFG) titulado "Auditoría de Seguridad de Comunicaciones en Red: Análisis de un entorno EDR/SIEM como caso de uso".
 

@@ -1,1 +1,0 @@
-{"bpf_skel":{"data_sections":[],"maps":[{"ident":"packet_buffer_map","name":"packet_buffer_map"}],"obj_name":"virtualInterface_bpf","progs":[{"attach":"cgroup_skb/ingress","link":true,"name":"redirect_packets"}]},"eunomia_version":"0.3.4"}

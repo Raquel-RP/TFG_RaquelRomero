@@ -5,9 +5,10 @@ import subprocess
 import sys
 import pwd
 import logging
-import random
+import secrets
 import iptc
 import signal
+import shlex
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -30,10 +31,15 @@ group_id = False
 # Define function to create a user
 def create_user(name):
 
-    logger.error("Creating new user...")
+    logger.info("Creating new user...")
 
     try:
-        subprocess.run(["sudo", "useradd", "-s", "/bin/bash", name], check=True)
+        sanitized_name = shlex.quote(name)  # Sanitize the name input
+        subprocess.run(
+            ["/usr/bin/sudo", "/usr/sbin/useradd", "-s", "/bin/bash",
+             sanitized_name],
+            check=True,
+        )
         logger.info(f'User "{name}" created successfully.')
 
     except subprocess.CalledProcessError as e:
@@ -41,12 +47,18 @@ def create_user(name):
         logger.error(f"Error: {error_message}")
         sys.exit(1)
 
+
 # Define function to delete a user
 def delete_user(name):
     logger.debug(f'Deleting user "{name}"...')
 
     try:
-        subprocess.run(["sudo", "userdel", name], check=True, text=True)
+        sanitized_name = shlex.quote(name)  # Sanitize the name input
+        subprocess.run(
+            ["/usr/bin/sudo", "/usr/sbin/userdel", sanitized_name],
+            check=True,
+            text=True,
+        )
         logger.info(f'User "{name}" deleted successfully.')
 
     except subprocess.CalledProcessError as e:
@@ -61,8 +73,9 @@ def add_iptables_rules(uid_str, group):
     logger.debug("Adding iptables rules...")
 
     try:
-        # Generates a random mark value in between 0 and 65535 (0xffff)
-        random_mark = random.randint(0, 65535)
+        # Generates a random mark value in between 0 and 65535 (0xffff) using
+        # a cryptographically secure random generator
+        random_mark = secrets.randbelow(65536)
         mark = format(random_mark, "#06x")
 
         # Rule to filter by user UID
@@ -79,7 +92,7 @@ def add_iptables_rules(uid_str, group):
         target_rule2 = rule2.create_target("NFLOG")
 
         # Adds NFLOG group if indicated
-        if group_id == True:
+        if group_id:
             target_rule2.set_parameter("nflog-group", str(group))
             logger.debug("NFLOG group added in INPUT rule succesfully.")
 
@@ -92,7 +105,7 @@ def add_iptables_rules(uid_str, group):
         target_rule3 = rule3.create_target("NFLOG")
 
         # Adds NFLOG group if indicated
-        if group_id == True:
+        if group_id:
             target_rule3.set_parameter("nflog-group", str(group))
             logger.debug("NFLOG group added in OUTPUT rule succesfully.")
 
@@ -126,7 +139,9 @@ def delete_iptables():
         input_chain.delete_rule(rule2)
         output_chain.delete_rule(rule3)
 
-        logger.info("Iptables rules added by com-filter.py deleted successfully.")
+        logger.info(
+            "Iptables rules added by com-filter.py deleted successfully."
+            )
 
     except iptc.IPTCError as e:
         error_message = str(e)
@@ -147,9 +162,10 @@ def check_user_exists(username):
         user_exists = False
         logger.info(f"User '{username}' does not exist.")
 
+
 # Define cleanup function
 def cleanup(user_str):
-    if user_exists == False:
+    if user_exists is False:
         delete_user(user_str)
     delete_iptables()
 
@@ -159,11 +175,15 @@ def main():
     parser = argparse.ArgumentParser(
         prog="com-filter.py",
         usage="%(prog)s [options]",
-        description="Tool to filter all network communications made by a determined user to the NFLOG.",
+        description=(
+            "Tool to filter all network communications made by a "
+            "determined user to the NFLOG."
+        ),
     )
 
     # Default argument
-    parser.add_argument("username", nargs="?", help="Username to run the command")
+    parser.add_argument("username", nargs="?",
+                        help="Username to run the command")
 
     # Optional arguments
     parser.add_argument(
@@ -192,7 +212,7 @@ def main():
     )
 
     args = parser.parse_args()
-    
+
     # Set logging level to DEBUG if verbose flag is set
     if args.verbose:
         logger.setLevel(logging.DEBUG)
@@ -206,18 +226,18 @@ def main():
 
         # Handle create-user option
         if args.create_user:
-            name = args.create_user[0]
+            name = args.create_user
             create_user(name)
 
         # Handle delete-user option
         if args.delete_user:
             delete_user(args.delete_user)
-        
+
         # Handle username argument
         if args.username:
             user_str = args.username
             check_user_exists(user_str)
-            if user_exists == False:
+            if user_exists is False:
                 create_user(user_str)
             if args.group:
                 global group_id
@@ -226,12 +246,15 @@ def main():
                 add_iptables_rules(user_str, group)
             else:
                 add_iptables_rules(user_str, None)
+
+            # Process suspenssion
             signal.pause()
 
     except KeyboardInterrupt:
         logger.info("KeyboardInterrupt received")
         cleanup(user_str)
         sys.exit(0)
+
 
 # Execute main function if script is run directly
 if __name__ == "__main__":
